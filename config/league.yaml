@@ -1,0 +1,87 @@
+# 聯盟規則。程式只能從這裡讀聯盟設定,不要 hardcode。
+# 標記 "verify" 的欄位要在 Phase 1 用 Yahoo league settings API 回應核對,不一致時以 API 為準並更新這裡。
+
+league:
+  name: 樹龜投不進肚子大聯盟
+  league_id: 23840
+  game_code: nba            # Yahoo game_key 由 API 依 game_code 與 season 解析,不要 hardcode
+  season: "2026-27"
+  num_teams: 12
+  scoring_type: head_to_head_categories
+  my_team_name: "(弘平)The decision 8.7"
+  my_team_alias_in_draft: "Your Team"   # data/draft/ 的 manager 欄位
+
+categories:
+  # key: 程式內部名稱 / yahoo_name: 對應 Yahoo stat category display name (verify) /
+  # kind: counting | percentage / higher_is_better / components: 百分比類別的分子與分母
+  - {key: fg_pct, label: "FG%",  yahoo_name: "FG%",  kind: percentage, higher_is_better: true,  components: [fgm, fga]}
+  - {key: ft_pct, label: "FT%",  yahoo_name: "FT%",  kind: percentage, higher_is_better: true,  components: [ftm, fta]}
+  - {key: fg3m,   label: "3PTM", yahoo_name: "3PTM", kind: counting,   higher_is_better: true}
+  - {key: pts,    label: "PTS",  yahoo_name: "PTS",  kind: counting,   higher_is_better: true}
+  - {key: reb,    label: "REB",  yahoo_name: "REB",  kind: counting,   higher_is_better: true}
+  - {key: ast,    label: "AST",  yahoo_name: "AST",  kind: counting,   higher_is_better: true}
+  - {key: stl,    label: "ST",   yahoo_name: "ST",   kind: counting,   higher_is_better: true}
+  - {key: blk,    label: "BLK",  yahoo_name: "BLK",  kind: counting,   higher_is_better: true}
+  - {key: tov,    label: "TO",   yahoo_name: "TO",   kind: counting,   higher_is_better: false}
+  - {key: dd,     label: "DD",   yahoo_name: "DD",   kind: counting,   higher_is_better: true}
+
+# prior_z_2026-27.csv 的欄位對應。prior 的 TO 已經轉成「正值越好」。
+prior_columns:
+  fg_pct: z_fg_pct
+  ft_pct: z_ft_pct
+  fg3m: z_3pm
+  pts: z_pts
+  reb: z_reb
+  ast: z_ast
+  stl: z_stl
+  blk: z_blk
+  tov: z_to
+  dd: z_dd
+
+matchup:
+  categories_total: 10
+  # 每週比 10 類,贏的類別數多者勝。平手類別的處理方式以 Yahoo 為準 (verify)
+  win_threshold_note: "贏 6 類以上必勝;5-5 或含平手的情況依 Yahoo 規則"
+
+roster:
+  slots:            # 每個位置的格數
+    PG: 1
+    SG: 1
+    G: 1
+    SF: 1
+    PF: 1
+    F: 1
+    C: 2
+    Util: 2
+    BN: 1
+    IL: 2
+  active_slots: [PG, SG, G, SF, PF, F, C, Util]   # 會累積數據的位置
+  eligibility:      # 這個 slot 可以放哪些球員位置
+    PG: [PG]
+    SG: [SG]
+    G: [PG, SG]
+    SF: [SF]
+    PF: [PF]
+    F: [SF, PF]
+    C: [C]
+    Util: [PG, SG, SF, PF, C]
+    BN: [PG, SG, SF, PF, C]
+    IL: [PG, SG, SF, PF, C]   # 只能放有 IL 資格傷病標記的球員 (verify)
+  lineup_lock: daily        # Daily - Today
+
+transactions:
+  weekly_max: 5
+  season_max: 90
+  waiver_type: FAB
+  waiver_days: 2
+  injured_to_il_direct: true
+
+schedule:
+  regular_season_weeks: 19   # verify: Week 1 可能是延長週
+  playoff_teams: 6
+  playoff_weeks: [20, 21, 22]
+  season_end_date: "2027-04-04"
+  week_start_day: monday      # verify
+
+report:
+  display_timezone: Asia/Taipei

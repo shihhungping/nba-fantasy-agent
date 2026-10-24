@@ -1,0 +1,52 @@
+# 模型參數。數值是初始預設,不是驗證過的最佳值。Phase 3 回測後再調整,調整時在 docs/methodology.md 的變更紀錄寫原因。
+
+pool:
+  size: 156                 # 12 隊 × 11 人 = 132,再加約 2 個 waiver 深度
+  min_gp_for_pool: 3        # 計算 actual 分布時,GP 太少的球員不進 pool
+  iterations: 2             # 先用全體算 z,取前 156 名,再用這 156 人重算分布
+
+sample_thresholds:
+  role_only_max_gp: 5       # 0-5 GP: 只看角色訊號,不改價值
+  counting_min_gp: 6        # counting stats 從 6 GP 開始混合
+  pct_min_gp: 16            # FG%, FT% 從 16 GP 開始混合
+
+blend:
+  # blended_z = w × actual_z + (1 − w) × prior_z, w = GP / (GP + k)
+  k:
+    counting: 15
+    fg_pct: 30
+    ft_pct: 40
+  src_k_multiplier:         # prior 信心低的球員,k 變小 → actual 權重更早變大
+    P: 1.0
+    S: 1.0
+    E: 0.5
+  no_prior_policy: actual_only   # 不在 prior 裡的球員 (新秀、waiver) 直接用 actual,並在報告標記
+
+role_signals:
+  mpg_change_flag: 5.0      # 最近 5 場 MPG 和季平均差 ≥ 5 分鐘 → 標記
+  recent_window_games: 5
+  fga_change_flag_pct: 0.30 # 最近 5 場 FGA 變化 ≥ 30% → 標記
+
+flags:
+  delta_z_flag: 1.0         # |blended_z − prior_z| ≥ 1.0 的類別要在報告標出
+
+transaction_budget:
+  reserve_for_playoffs: 15  # Week 20-22 每週 5 次
+  # 例行賽每週平均 = (season_max − reserve − 已用) / 剩餘例行賽週數
+
+punt:
+  allowed: [fg_pct, ft_pct, fg3m, pts, ast, tov]
+  never: [reb, stl, blk, dd]
+  max_punt: 1
+  trigger_threshold: -1.5   # 該類 blended z 合計 ≤ −1.5 才考慮 punt
+  min_weeks_before_change: 4
+
+prediction:
+  method: monte_carlo       # 從球員 game log 抽樣模擬每週類別總和
+  n_sims: 5000
+  seed: 42
+  min_games_for_resample: 8 # game log 少於 8 場時,用 prior 推回的 per-game 分布補樣本
+
+backtest:
+  calibration_bins: [0.0, 0.2, 0.4, 0.6, 0.8, 1.0]
+  recommendation_eval_weeks: [2, 4]   # add/drop 建議在 2 週、4 週後評估

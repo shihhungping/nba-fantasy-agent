@@ -1,0 +1,27 @@
+# secrets
+.env
+.secrets/
+*token*.json
+
+# raw API cache (debug only)
+.cache/
+
+# derived outputs (rebuildable from data/warehouse)
+data/derived/
+
+# python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.pytest_cache/
+.ruff_cache/
+
+# os / editor
+.DS_Store
+.vscode/
+.idea/
+
+# local claude settings
+.claude/settings.local.json
