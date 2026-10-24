@@ -85,3 +85,13 @@ schedule:
 
 report:
   display_timezone: Asia/Taipei
+
+# NBA 球隊縮寫標準 = NBA 官方 3 碼 (GSW, NOP, NYK, PHX, SAS ...)。
+# 各來源的非標準寫法在這裡對到標準碼,loader 讀入時正規化。Phase 1 再補 Yahoo 的寫法。
+# key 一定要加引號: YAML 1.1 會把裸的 NO 解析成 false。
+team_aliases:
+  "GS": GSW     # prior_z_2026-27.csv
+  "NO": NOP
+  "NY": NYK
+  "PHO": PHX
+  "SA": SAS

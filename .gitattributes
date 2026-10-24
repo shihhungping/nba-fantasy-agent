@@ -1,0 +1,2 @@
+# 統一 LF,避免 Windows 本機與雲端 (Linux) 的 warehouse CSV diff 互相打架
+* text=auto eol=lf

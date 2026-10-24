@@ -84,7 +84,8 @@ data/prior/ + data/draft/ (seed) ──────────┤
 ## 6. NBA 賽程 (未定)
 
 - 使用者會另外申請 NBA 資料 API。先定義 `ScheduleProvider` interface,第一個實作讀 `data/manual/nba_schedule_2026-27.csv`。
-- CSV 欄位: `game_date, home_team, away_team` (球隊縮寫與 prior 一致)。
+- CSV 欄位: `game_date, home_team, away_team` (球隊縮寫用 NBA 官方 3 碼,例如 GSW、NOP、NYK、PHX、SAS)。
+- 球隊縮寫標準一律是 NBA 官方 3 碼。prior 用的 GS/NO/NY/PHO/SA 等非標準寫法列在 `config/league.yaml` 的 `team_aliases`,loader 讀入時轉換。
 - 換成 API 時只新增 provider 實作,不改下游。
 
 ## 7. Open questions

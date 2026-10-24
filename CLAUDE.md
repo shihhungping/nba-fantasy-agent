@@ -62,8 +62,13 @@ scripts/         一次性腳本 (convert_seed_data.py 已執行過)
 
 ## 常用指令 (隨 phase 實作逐步補上)
 ```bash
+python -m venv .venv            # 本機第一次 (全域 Python 的 pandas 壞掉,一律用 venv)
+.venv\Scripts\activate          # Windows;bash 下用 source .venv/Scripts/activate
+pip install -e ".[dev]"         # 安裝
 pytest                          # 測試
 ruff check src tests            # lint
+fantasy --help                  # Phase 0: CLI 骨架
+fantasy version                 # Phase 0: 顯示版本 (python -m fantasy version 亦可)
 fantasy auth                    # Phase 1: 本機 OAuth 授權
 fantasy sync --since 2026-10-20 # Phase 1: 抓資料寫入 warehouse
 fantasy compute                 # Phase 2: 計算 actual / blended z
@@ -72,6 +77,11 @@ fantasy backtest                # Phase 3: 預測準確度
 ```
 
 ## 目前狀態
-- 2026-10-24: 開季第 1 週。只有 seed data 與設定檔,還沒有程式碼。從 `docs/roadmap.md` 的 Phase 0 開始。
+- 2026-10-24: 開季第 1 週。**Phase 0 完成** (78 tests 通過)。下一步 Phase 1 (Yahoo ingest),等使用者確認並準備 Yahoo app。
+  - `src/fantasy/`: `cli.py` (Typer)、`config.py` (pydantic,`load_configs()`)、`seeds.py` (`load_prior/load_draft/load_manual_roster`)、`names.py` (`name_key/short_key/match_name`)、`budget.py` (`compute_budget`)、`paths.py`。
+  - 球隊縮寫標準 = NBA 官方 3 碼,別名在 `league.yaml` 的 `team_aliases` (key 要加引號,YAML 會把 `NO` 讀成 false)。
+  - 名字比對: key 去變音/去 Jr./III;縮寫名用 (首字母, 姓氏);多候選用 nba_team 消歧,仍多個 → ambiguous,不模糊比對。
+  - draft 對 prior: 128/132 對得到,對不到 4 人 (K. Filipowski、K. Maluach、R. Hachimura、W. Carter Jr.,prior 裡本來就沒有)。
+  - 預算: floor 取整、週初基準 (methodology §7)。
 - 我的陣容截至 2026-10-24 見 `data/manual/my_roster_2026-10-24.csv` (由 Yahoo 截圖轉錄,Kessler 那場比賽當時正在進行,數字可能不完整)。
 - NBA 賽程資料來源還沒決定 (使用者會另外申請 NBA 資料 API),先用 interface + CSV fallback。
